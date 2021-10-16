@@ -1,9 +1,24 @@
 
 from flask import Flask
 import requests
-import time
+#import time
+
+URL = "https://min-api.cryptocompare.com/data/v2/histominute?fsym={}&tsym={}&limit={}"
 
 
+
+def get_price(coin,currency,limit):
+    sum = 0
+    try:
+        response = requests.get(URL.format(coin,currency,limit)).json()
+        for i in range(10):
+            sum += response['Data']['Data'][i]['close']
+     #   data = {'price': response['Data']['Data'][9]['close'], 'average': sum/10}
+        return response['Data']['Data'][9]['close'],sum/10
+    except:
+        return False
+    
+'''
 
 def calculateavg(bitcoin_history):
     summ=0
@@ -46,13 +61,19 @@ def home():
   print(get_latest_bitcoin_price())
   return ("The average of the 10 minutes is: " + str(avg10) + "\nThe current Price is :"+ str(get_latest_bitcoin_price()) )
 
-
+'''
+app = Flask(__name__)
+@app.route("/")
+def hello_world():
+    currentprice,avg10= get_price("BTC","USD","10")
+   
+    return ("The average of the 10 minutes is: " + str(avg10) + "\nThe current Price is :"+ str(currentprice) )
 
 
         
  
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=8989)
+    app.run()
 
 
 
